@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
-public class ItemRepositoryDao implements ItemRepository {
+public class InMemoryItemStorage implements ItemRepository {
     private final Map<Integer, Item> items;
     private final UserRepository userRepository;
     private Integer id = 0;
@@ -52,7 +52,7 @@ public class ItemRepositoryDao implements ItemRepository {
     @Override
     public List<Item> getItemsByOwnerId(Integer userId) {
         List<Item> ownerItems = new ArrayList<>();
-        for(Item item : items.values()) {
+        for (Item item : items.values()) {
             if (item.getOwnerId().equals(userId)) {
                 ownerItems.add(item);
             }

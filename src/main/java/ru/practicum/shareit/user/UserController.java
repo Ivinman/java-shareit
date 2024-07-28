@@ -24,7 +24,7 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public User updateUser(@RequestBody UserDto userDto,
-                           @PathVariable Integer userId) throws Exception{
+                           @PathVariable Integer userId) throws Exception {
         log.info("Поступление запроса на обновление информации о пользователе");
         return userService.updateUser(userDto, userId);
     }
@@ -40,6 +40,7 @@ public class UserController {
         log.info("Поступил запрос на получение пользователя по id");
         return userService.getUserById(id);
     }
+
     @DeleteMapping("/{userId}")
     public void removeUser(@PathVariable("userId") Integer id) {
         log.info("Поступил запрос на удаление пользователя");

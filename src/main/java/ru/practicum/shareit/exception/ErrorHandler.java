@@ -24,7 +24,4 @@ public class ErrorHandler {
     public ErrorResponse handleExpe(final OwnerException e) {
         return new ErrorResponse(e.getMessage());
     }
-
-    //@ExceptionHandler({BadRequestException.class})
-    //@ResponseStatus(HttpStatus.BAD_REQUEST)
 }

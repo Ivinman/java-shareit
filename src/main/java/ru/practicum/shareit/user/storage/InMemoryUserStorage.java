@@ -8,7 +8,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.*;
 
 @Repository
-public class UserRepositoryImpl implements UserRepository {
+public class InMemoryUserStorage implements UserRepository {
     private final Map<Integer, User> users = new HashMap<>();
     private Integer id = 0;
 
