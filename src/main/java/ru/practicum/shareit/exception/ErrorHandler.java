@@ -24,4 +24,10 @@ public class ErrorHandler {
     public ErrorResponse handleExpe(final OwnerException e) {
         return new ErrorResponse(e.getMessage());
     }
+
+    @ExceptionHandler({AlreadyExistException.class})
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleAlreadyExistExc(final AlreadyExistException e) {
+        return new ErrorResponse(e.getMessage());
+    }
 }
