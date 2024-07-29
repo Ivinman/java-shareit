@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.AlreadyExistException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
@@ -23,8 +22,10 @@ public class UserServiceImpl implements UserService {
         if (!validation(userDto)) {
             throw new ValidationException("Ошибка валидации");
         }
-        if (userRepository.getAllUsers().contains(UserMapper.toUser(userDto))) {
-            throw new AlreadyExistException("Данный пользователь уже добавлен");
+        for (User userFromRep : userRepository.getAllUsers()) {
+            if (userFromRep.getEmail().equals(userDto.getEmail())) {
+                throw new AlreadyExistException("Данный пользователь уже добавлен");
+            }
         }
         return userRepository.createUser(userDto);
     }
@@ -36,9 +37,11 @@ public class UserServiceImpl implements UserService {
                 throw new ValidationException("Ошибка валидации");
             }
         }
-        if (userRepository.getAllUsers().contains(UserMapper.toUser(userDto))) {
-            if (!userRepository.getUserById(userId).getEmail().equals(userDto.getEmail())) {
-                throw new AlreadyExistException("Почта уже используется");
+        for (User userFromRep : userRepository.getAllUsers()) {
+            if (userFromRep.getEmail().equals(userDto.getEmail())) {
+                if (!userRepository.getUserById(userId).getEmail().equals(userDto.getEmail())) {
+                    throw new AlreadyExistException("Почта уже используется");
+                }
             }
         }
         return userRepository.updateUser(userDto, userId);
