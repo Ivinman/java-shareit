@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserForTest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -23,8 +24,8 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public User updateUser(@RequestBody UserDto userDto,
-                           @PathVariable Integer userId) throws Exception {
+    public UserForTest updateUser(@RequestBody UserDto userDto,
+                                  @PathVariable Integer userId) throws Exception {
         log.info("Поступление запроса на обновление информации о пользователе");
         return userService.updateUser(userDto, userId);
     }
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Integer id) {
+    public UserForTest getUserById(@PathVariable Integer id) {
         log.info("Поступил запрос на получение пользователя по id");
         return userService.getUserById(id);
     }
