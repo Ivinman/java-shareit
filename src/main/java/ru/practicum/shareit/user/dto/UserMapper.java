@@ -16,10 +16,4 @@ public class UserMapper {
                 userDto.getEmail()
         );
     }
-
-    public static UserForTest toUserForTest(User user) {
-        return new UserForTest(String.valueOf(user.getId()),
-                user.getName(),
-                user.getEmail());
-    }
 }

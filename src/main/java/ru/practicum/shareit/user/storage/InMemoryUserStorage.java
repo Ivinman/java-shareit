@@ -2,7 +2,6 @@ package ru.practicum.shareit.user.storage;
 
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserForTest;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
@@ -23,7 +22,7 @@ public class InMemoryUserStorage implements UserRepository {
     }
 
     @Override
-    public UserForTest updateUser(UserDto userDto, Integer userId) {
+    public User updateUser(UserDto userDto, Integer userId) {
         User user;
         if (userDto.getName() == null) {
             user = new User(users.get(userId).getName(), userDto.getEmail());
@@ -34,7 +33,7 @@ public class InMemoryUserStorage implements UserRepository {
         }
         user.setId(userId);
         users.put(userId, user);
-        return UserMapper.toUserForTest(user);
+        return user;
     }
 
     @Override
@@ -43,11 +42,11 @@ public class InMemoryUserStorage implements UserRepository {
     }
 
     @Override
-    public UserForTest getUserById(Integer id) {
+    public User getUserById(Integer id) {
         if (users.get(id) == null) {
             return null;
         }
-        return UserMapper.toUserForTest(users.get(id));
+        return users.get(id);
     }
 
     @Override

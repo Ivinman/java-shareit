@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.AlreadyExistException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserForTest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
@@ -32,7 +31,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserForTest updateUser(UserDto userDto, Integer userId) throws Exception {
+    public User updateUser(UserDto userDto, Integer userId) throws Exception {
         if (userDto.getEmail() != null) {
             if (userDto.getEmail().isBlank() || userDto.getEmail().isEmpty() || !userDto.getEmail().contains("@")) {
                 throw new ValidationException("Ошибка валидации");
@@ -54,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserForTest getUserById(Integer id) {
+    public User getUserById(Integer id) {
         return userRepository.getUserById(id);
     }
 
