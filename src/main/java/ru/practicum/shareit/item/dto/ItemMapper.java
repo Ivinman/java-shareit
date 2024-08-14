@@ -1,22 +1,47 @@
 package ru.practicum.shareit.item.dto;
 
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.storage.BookingRepository;
+import ru.practicum.shareit.item.comment.storage.CommentRepository;
 import ru.practicum.shareit.item.model.Item;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
         return new ItemDto(
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable(),
-                item.getRequest() != null ? item.getRequest().getId() : null
+                item.getAvailable()
         );
     }
 
     public static Item toItem(ItemDto itemDto, Integer ownerId) {
-        Item newItem = new Item(ownerId);
+        Item newItem = new Item();
         newItem.setName(itemDto.getName());
         newItem.setDescription(itemDto.getDescription());
         newItem.setAvailable(itemDto.getAvailable());
         return newItem;
+    }
+
+    public static ItemDateAndCommDto toItemDateDto(Item item,
+                                                   BookingRepository bookingRepository,
+                                                   CommentRepository commentRepository) {
+        ItemDateAndCommDto itemDateAndCommDto = new ItemDateAndCommDto();
+        itemDateAndCommDto.setId(item.getId());
+        itemDateAndCommDto.setName(item.getName());
+        itemDateAndCommDto.setDescription(item.getDescription());
+        itemDateAndCommDto.setAvailable(item.getAvailable());
+        List<Booking> bookingMap = bookingRepository.findByItemId(item.getId());
+        for (Booking booking : bookingMap) {
+            if (booking.getStart().isAfter(LocalDateTime.now())) {
+                itemDateAndCommDto.setLastBooking(bookingMap.get(booking.getId() - 1).getEnd());
+                itemDateAndCommDto.setNextBooking(booking.getStart());
+                break;
+            }
+        }
+        itemDateAndCommDto.setComments(commentRepository.findByItemId(item.getId()));
+        return itemDateAndCommDto;
     }
 }

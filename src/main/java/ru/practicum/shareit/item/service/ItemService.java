@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.item.comment.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemDateAndCommDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
@@ -10,9 +12,11 @@ public interface ItemService {
 
     Item editItem(Integer userId, Integer itemId, ItemDto itemDto) throws Exception;
 
-    Item getItemById(Integer itemId);
+    ItemDateAndCommDto getItemById(Integer itemId);
 
-    List<Item> getItemsByOwnerId(Integer userId);
+    List<ItemDateAndCommDto> getItemsByOwnerId(Integer userId);
 
     List<Item> getSearchedItems(String text);
+
+    CommentDto addComment(Integer userId, Integer itemId, CommentDto commentDto) throws Exception;
 }
