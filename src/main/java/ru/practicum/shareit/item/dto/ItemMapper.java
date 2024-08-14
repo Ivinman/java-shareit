@@ -33,6 +33,10 @@ public class ItemMapper {
         itemDateAndCommDto.setName(item.getName());
         itemDateAndCommDto.setDescription(item.getDescription());
         itemDateAndCommDto.setAvailable(item.getAvailable());
+        if (bookingRepository.findByItemId(item.getId()).isEmpty()) {
+            itemDateAndCommDto.setLastBooking(null);
+            itemDateAndCommDto.setNextBooking(null);
+        }
         List<Booking> bookingMap = bookingRepository.findByItemId(item.getId());
         for (Booking booking : bookingMap) {
             if (booking.getStart().isAfter(LocalDateTime.now())) {

@@ -12,8 +12,8 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findByBookerIdAndBookingStatusIn(Integer bookerId, Collection<BookingStatus> state, Sort sort);
 
     @Query("select b from Booking b " +
-            "join Item i on i.id = b.item " +
-            "join User u on i.user = u.id " +
+            "join Item i on i.id = b.item.id " +
+            "join User u on i.user.id = u.id " +
             "where u.id = ?1 " +
             "and b.bookingStatus like '?2'")
     List<Booking> findByUserId(Integer userId, String state, Sort sort);

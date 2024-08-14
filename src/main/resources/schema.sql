@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS items (
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
     available BOOLEAN DEFAULT FALSE,
-    owner_id INTEGER
+    user_id INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS bookings (

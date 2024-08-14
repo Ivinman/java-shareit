@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 
 import ru.practicum.shareit.enums.BookingStatus;
@@ -7,11 +8,10 @@ import ru.practicum.shareit.enums.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "booking")
+@Table(name = "bookings")
 @Getter
 @Setter
 @ToString
