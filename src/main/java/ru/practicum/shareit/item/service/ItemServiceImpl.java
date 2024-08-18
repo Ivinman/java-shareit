@@ -46,7 +46,6 @@ public class ItemServiceImpl implements ItemService {
                 || itemDto.getAvailable() == null) {
             throw new ValidationException("Ошибка валидации");
         }
-
         Item item = ItemMapper.toItem(itemDto, userId);
         item.setUser(userRepository.findById(userId).get());
         return itemRepository.save(item);
@@ -54,11 +53,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item editItem(Integer userId, Integer itemId, ItemDto itemDto) throws Exception {
+        if (itemRepository.findById(itemId).isEmpty()) {
+            throw new NotFoundException("Предмет с данным id не найден");
+        }
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
+        }
         if (!itemRepository.findById(itemId).get().getUser().getId().equals(userId)) {
             throw new OwnerException("Пользователь не является владельцем");
         }
-
-
         Item item = itemRepository.findById(itemId).get();
         if (itemDto.getName() != null) {
             item.setName(itemDto.getName());
@@ -74,13 +77,20 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDateAndCommDto getItemById(Integer itemId) {
+        if (itemRepository.findById(itemId).isEmpty()) {
+            throw new NotFoundException("Предмет с данным id не найден");
+        }
         return ItemMapper.toItemDateDto(itemRepository.findById(itemId).get(), bookingRepository, commentRepository);
     }
 
     @Override
     public List<ItemDateAndCommDto> getItemsByOwnerId(Integer userId) {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
+        }
         List<ItemDateAndCommDto> itemDateAndCommDtos = new ArrayList<>();
-        for (Item item : itemRepository.findByUserId(userId)) {
+        List<Item> itemsFromRepository = itemRepository.findByUserId(userId);
+        for (Item item : itemsFromRepository) {
             itemDateAndCommDtos.add(ItemMapper.toItemDateDto(item, bookingRepository, commentRepository));
         }
         return itemDateAndCommDtos;
@@ -92,7 +102,8 @@ public class ItemServiceImpl implements ItemService {
         if (text.isEmpty() || text.isBlank()) {
             return items;
         }
-        for (Item item : itemRepository.search(text)) {
+        List<Item> itemsFromRepository = itemRepository.search(text);
+        for (Item item : itemsFromRepository) {
             if (item.getAvailable()) {
                 items.add(item);
             }
@@ -102,6 +113,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto addComment(Integer userId, Integer itemId, CommentDto commentDto) throws Exception {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
+        }
+        if (itemRepository.findById(itemId).isEmpty()) {
+            throw new NotFoundException("Предмет с данным id не найден");
+        }
         if (!bookingService.getAllBookings(userId, BookingStatus.ALL).isEmpty()) {
             for (Booking booking : bookingService.getAllBookings(userId, BookingStatus.ALL)) {
                 if (booking.getItem().getId().equals(itemId) && booking.getEnd().isBefore(LocalDateTime.now())) {

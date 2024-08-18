@@ -38,7 +38,6 @@ public class BookingServiceImpl implements BookingService {
         if (bookingDto.getStart().equals(bookingDto.getEnd())) {
             throw new ValidationException("Старт и конец бронирования совпадают");
         }
-
         if (bookingDto.getStart().isBefore(LocalDateTime.now())) {
             throw new ValidationException("Некорректное время начала брогирования");
         }
@@ -52,11 +51,19 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException("Предмет не доступен");
         }
         Booking booking = BookingMapper.toBooking(userId, bookingDto, itemRepository, userRepository);
+        booking.setStatus(Status.WAITING);
+        booking.setBookingStatus(BookingStatus.FUTURE);
         return bookingRepository.save(booking);
     }
 
     @Override
     public Booking patchBooking(Integer userId, Integer bookingId, Boolean approved) throws ValidationException {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new ValidationException("Такого пользователя нет");
+        }
+        if (bookingRepository.findById(bookingId).isEmpty()) {
+            throw new NotFoundException("Такого бронирования нет");
+        }
         Booking booking = bookingRepository.findById(bookingId).get();
         if (!booking.getItem().getUser().getId().equals(userId)) {
             throw new ValidationException("Не владелец вещи");
@@ -71,6 +78,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking getBooking(Integer userId, Integer bookingId) throws ValidationException {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("Такого пользователя нет");
+        }
+        if (bookingRepository.findById(bookingId).isEmpty()) {
+            throw new NotFoundException("Такого бронирования нет");
+        }
         Booking booking = bookingRepository.findById(bookingId).get();
         if (booking.getBooker().getId().equals(userId) || booking.getItem().getUser().getId().equals(userId)) {
             return booking;
