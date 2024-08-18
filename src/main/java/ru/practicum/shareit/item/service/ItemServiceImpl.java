@@ -2,14 +2,25 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.booking.storage.BookingRepository;
+import ru.practicum.shareit.enums.BookingStatus;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.OwnerException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.comment.storage.CommentRepository;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
+import ru.practicum.shareit.item.comment.dto.CommentMapper;
+import ru.practicum.shareit.item.dto.ItemDateAndCommDto;
+import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.storage.UserRepository;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,10 +28,13 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final BookingService bookingService;
+    private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public Item addItem(Integer userId, ItemDto itemDto) throws Exception {
-        if (userRepository.getUserById(userId) == null) {
+        if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Указаный пользователь не найден");
         }
         if (itemDto.getName() == null
@@ -32,29 +46,88 @@ public class ItemServiceImpl implements ItemService {
                 || itemDto.getAvailable() == null) {
             throw new ValidationException("Ошибка валидации");
         }
-        return itemRepository.addItem(userId, itemDto);
+        Item item = ItemMapper.toItem(itemDto, userId);
+        item.setUser(userRepository.findById(userId).get());
+        return itemRepository.save(item);
     }
 
     @Override
     public Item editItem(Integer userId, Integer itemId, ItemDto itemDto) throws Exception {
-        if (!itemRepository.getItemById(itemId).getOwnerId().equals(userId)) {
+        if (itemRepository.findById(itemId).isEmpty()) {
+            throw new NotFoundException("Предмет с данным id не найден");
+        }
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
+        }
+        if (!itemRepository.findById(itemId).get().getUser().getId().equals(userId)) {
             throw new OwnerException("Пользователь не является владельцем");
         }
-        return itemRepository.editItem(userId, itemId, itemDto);
+        Item item = itemRepository.findById(itemId).get();
+        if (itemDto.getName() != null) {
+            item.setName(itemDto.getName());
+        }
+        if (itemDto.getDescription() != null) {
+            item.setDescription(itemDto.getDescription());
+        }
+        if (itemDto.getAvailable() != null) {
+            item.setAvailable(itemDto.getAvailable());
+        }
+        return itemRepository.save(item);
     }
 
     @Override
-    public Item getItemById(Integer itemId) {
-        return itemRepository.getItemById(itemId);
+    public ItemDateAndCommDto getItemById(Integer itemId) {
+        if (itemRepository.findById(itemId).isEmpty()) {
+            throw new NotFoundException("Предмет с данным id не найден");
+        }
+        return ItemMapper.toItemDateDto(itemRepository.findById(itemId).get(), bookingRepository, commentRepository);
     }
 
     @Override
-    public List<Item> getItemsByOwnerId(Integer userId) {
-        return itemRepository.getItemsByOwnerId(userId);
+    public List<ItemDateAndCommDto> getItemsByOwnerId(Integer userId) {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
+        }
+        List<ItemDateAndCommDto> itemDateAndCommDtos = new ArrayList<>();
+        List<Item> itemsFromRepository = itemRepository.findByUserId(userId);
+        for (Item item : itemsFromRepository) {
+            itemDateAndCommDtos.add(ItemMapper.toItemDateDto(item, bookingRepository, commentRepository));
+        }
+        return itemDateAndCommDtos;
     }
 
     @Override
     public List<Item> getSearchedItems(String text) {
-        return itemRepository.getSearchedItems(text);
+        List<Item> items = new ArrayList<>();
+        if (text.isEmpty() || text.isBlank()) {
+            return items;
+        }
+        List<Item> itemsFromRepository = itemRepository.search(text);
+        for (Item item : itemsFromRepository) {
+            if (item.getAvailable()) {
+                items.add(item);
+            }
+        }
+        return items;
+    }
+
+    @Override
+    public CommentDto addComment(Integer userId, Integer itemId, CommentDto commentDto) throws Exception {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
+        }
+        if (itemRepository.findById(itemId).isEmpty()) {
+            throw new NotFoundException("Предмет с данным id не найден");
+        }
+        if (!bookingService.getAllBookings(userId, BookingStatus.ALL).isEmpty()) {
+            for (Booking booking : bookingService.getAllBookings(userId, BookingStatus.ALL)) {
+                if (booking.getItem().getId().equals(itemId) && booking.getEnd().isBefore(LocalDateTime.now())) {
+                    return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto, itemId, userId,
+                            itemRepository, userRepository)));
+                }
+                throw new ValidationException("Пользователь не брал эту вещь или бронь ещё не закончена");
+            }
+        }
+        throw new NotFoundException("У пользователя нет броней");
     }
 }
