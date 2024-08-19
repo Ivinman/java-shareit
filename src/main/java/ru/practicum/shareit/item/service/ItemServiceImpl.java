@@ -89,8 +89,8 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("Пользователь не найден");
         }
         List<ItemDateAndCommDto> itemDateAndCommDtos = new ArrayList<>();
-        List<Item> itemsFromRepository = itemRepository.findByUserId(userId);
-        for (Item item : itemsFromRepository) {
+        List<Item> itemList = itemRepository.findByUserId(userId);
+        for (Item item : itemList) {
             itemDateAndCommDtos.add(ItemMapper.toItemDateDto(item, bookingRepository, commentRepository));
         }
         return itemDateAndCommDtos;

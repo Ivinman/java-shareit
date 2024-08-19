@@ -1,36 +1,34 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.request.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "items")
+@Table(name = "item-requests")
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode
-public class Item {
+public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name")
-    private String name;
-
     @Column(name = "description")
     private String description;
-
-    @Column(name = "available")
-    private Boolean available;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "request_id")
-    private ItemRequest itemRequest;
+    /*@ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;*/
+
+    @Column(name = "created")
+    private LocalDateTime created;
 }
