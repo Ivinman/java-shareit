@@ -9,7 +9,10 @@ import java.util.Set;
 
 public interface ItemRequestService {
     ItemRequest addRequest(Integer userId, ItemRequestDto itemRequestDto);
+
     List<ItemRequestDto> getUsersRequests(Integer userId);
+
     Set<ItemRequestRespDto> getAllRequests(Integer userId);
+    
     ItemRequestDto getRequestById(Integer userId, Integer requestId);
 }
