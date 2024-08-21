@@ -1,7 +1,5 @@
 package ru.practicum.shareit.bookinggateway.dto;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.FutureOrPresent;
 import lombok.Data;
 
 import java.time.LocalDateTime;

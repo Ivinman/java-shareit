@@ -11,7 +11,6 @@ import ru.practicum.shareit.bookinggateway.dto.BookingDto;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.enumsgateway.BookingStatus;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service

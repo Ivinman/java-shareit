@@ -21,8 +21,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.storage.ItemRequestRepository;
 import ru.practicum.shareit.user.storage.UserRepository;
 
-import ru.practicum.shareit.enums.BookingStatus;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

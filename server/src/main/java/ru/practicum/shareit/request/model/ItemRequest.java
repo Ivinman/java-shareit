@@ -2,7 +2,6 @@ package ru.practicum.shareit.request.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -24,10 +23,6 @@ public class ItemRequest {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    /*@ManyToOne
-    @JoinColumn(name = "item_id")
-    private Item item;*/
 
     @Column(name = "created")
     private LocalDateTime created;
