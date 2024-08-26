@@ -40,11 +40,18 @@ public class UserServiceImpl implements UserService {
 
             for (User userFromRep : userRepository.findAll()) {
                 if (userFromRep.getEmail().equals(userDto.getEmail())) {
+                    throw new AlreadyExistException("Почта уже используется");
+                }
+            }
+
+
+            /*for (User userFromRep : userRepository.findAll()) {
+                if (userFromRep.getEmail().equals(userDto.getEmail())) {
                     if (!userRepository.findById(userId).get().getEmail().equals(userDto.getEmail())) {
                         throw new AlreadyExistException("Почта уже используется");
                     }
                 }
-            }
+            }*/
         }
         User user = userRepository.findById(userId).get();
         if (userDto.getName() != null) {
