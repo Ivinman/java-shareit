@@ -20,7 +20,12 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest(properties = "jdbc.url=jdbc:postgresql://localhost:5432/test")
+
+@SpringBootTest(properties = "spring.sql.init.mode=always
+spring.datasource.url=jdbc:h2:file:./db/test
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=password")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserServiceImplTest {
     private final EntityManager entityManager;
