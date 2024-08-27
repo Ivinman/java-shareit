@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.hamcrest.Matchers.is;
 
 @Transactional
-@SpringBootTest(properties = "jdbc.url=jdbc:postgresql://localhost:5432/test")
+@SpringBootTest //(properties = "jdbc.url=jdbc:postgresql://localhost:5432/test")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();

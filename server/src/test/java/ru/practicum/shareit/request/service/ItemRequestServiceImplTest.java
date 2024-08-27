@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest(properties = "jdbc.url=jdbc:postgresql://localhost:5432/test")
+@SpringBootTest //(properties = "jdbc.url=jdbc:postgresql://localhost:5432/test")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemRequestServiceImplTest {
     private final ItemRequestService itemRequestService;
