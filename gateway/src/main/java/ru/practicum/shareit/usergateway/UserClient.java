@@ -8,6 +8,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
+import ru.practicum.shareit.exceptiongateway.ValidationException;
 import ru.practicum.shareit.usergateway.dto.UserDto;
 
 @Service
@@ -24,7 +25,10 @@ public class UserClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> createUser(UserDto userDto) {
+    public ResponseEntity<Object> createUser(UserDto userDto) throws Exception {
+        if (!validation(userDto)) {
+            throw new ValidationException("Ошибка валидации");
+        }
         return post("", userDto);
     }
 
@@ -42,5 +46,12 @@ public class UserClient extends BaseClient {
 
     public ResponseEntity<Object> removeUser(Integer id) {
         return delete("/" + id);
+    }
+
+    private boolean validation(UserDto userDto) {
+        return userDto.getEmail() != null
+                && !userDto.getEmail().isBlank()
+                && !userDto.getEmail().isEmpty()
+                && userDto.getEmail().contains("@");
     }
 }

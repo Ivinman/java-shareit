@@ -14,7 +14,6 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.user.storage.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,18 +28,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking addBooking(Integer userId, BookingDto bookingDto) throws Exception {
-        if ((bookingDto.getStart() == null) || bookingDto.getEnd() == null) {
-            throw new ValidationException("Не заданы параметры времени");
-        }
-        if (bookingDto.getEnd().isBefore(LocalDateTime.now())) {
-            throw new ValidationException("Некорректное время конца брогирования");
-        }
-        if (bookingDto.getStart().equals(bookingDto.getEnd())) {
-            throw new ValidationException("Старт и конец бронирования совпадают");
-        }
-        if (bookingDto.getStart().isBefore(LocalDateTime.now())) {
-            throw new ValidationException("Некорректное время начала бронирования");
-        }
         if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Такого пользователя нет");
         }

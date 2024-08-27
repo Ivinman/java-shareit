@@ -42,23 +42,11 @@ public class ItemServiceImpl implements ItemService {
         if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Указаный пользователь не найден");
         }
-        if (itemDto.getName() == null
-                || itemDto.getName().isBlank()
-                || itemDto.getName().isEmpty()
-                || itemDto.getDescription() == null
-                || itemDto.getDescription().isBlank()
-                || itemDto.getDescription().isEmpty()
-                || itemDto.getAvailable() == null) {
-            throw new ValidationException("Ошибка валидации");
-        }
         Item item = ItemMapper.toItem(itemDto, userId);
         item.setUser(userRepository.findById(userId).get());
         if (itemDto.getRequestId() != null) {
             item.setItemRequest(itemRequestRepository.findById(itemDto.getRequestId()).get());
         }
-
-        System.out.println(itemDto);
-
         return itemRepository.save(item);
     }
 
@@ -147,32 +135,5 @@ public class ItemServiceImpl implements ItemService {
             }
         }
         throw new NotFoundException("У пользователя нет броней");
-
-
-        /*if (!bookingService.getAllBookings(userId, BookingStatus.ALL).isEmpty()) {
-            for (Booking booking : bookingService.getAllBookings(userId, BookingStatus.ALL)) {
-                if (booking.getItem().getId().equals(itemId)) {
-                    if (booking.getEnd().isBefore(LocalDateTime.now())) {
-                        return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto, itemId, userId,
-                                itemRepository, userRepository)));
-                    }
-                    throw new ValidationException("Пользователь не брал эту вещь или бронь ещё не закончена");
-                }
-            }
-        }
-        throw new NotFoundException("У пользователя нет броней");*/
-
-
-
-        /*if (!bookingService.getAllBookings(userId, BookingStatus.ALL).isEmpty()) {
-            for (Booking booking : bookingService.getAllBookings(userId, BookingStatus.ALL)) {
-                if (booking.getItem().getId().equals(itemId) && booking.getEnd().isBefore(LocalDateTime.now())) {
-                    return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto, itemId, userId,
-                            itemRepository, userRepository)));
-                }
-                throw new ValidationException("Пользователь не брал эту вещь или бронь ещё не закончена");
-            }
-        }
-        throw new NotFoundException("У пользователя нет броней");*/
     }
 }

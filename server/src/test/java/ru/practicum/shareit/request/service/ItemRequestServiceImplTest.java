@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,24 +27,43 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest //(properties = "jdbc.url=jdbc:postgresql://localhost:5432/test")
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemRequestServiceImplTest {
     private final ItemRequestService itemRequestService;
     private final UserService userService;
     private final EntityManager entityManager;
     private final ItemRequestRepository itemRequestRepository;
+    private UserDto userDto;
+    private UserDto userDto2;
+    private User user;
+    private User user2;
+    private ItemRequestDto itemRequestDto;
+    private ItemRequestDto itemRequestDto2;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        userDto = new UserDto("user", "user@user.com");
+        userService.createUser(userDto);
+        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
+        user = query.setParameter("email", userDto.getEmail()).getSingleResult();
+
+        userDto2 = new UserDto("user2", "user2@user.com");
+        userService.createUser(userDto2);
+        TypedQuery<User> query2 = entityManager.createQuery("select u from User u where u.email = :email", User.class);
+        user2 = query2.setParameter("email", userDto.getEmail()).getSingleResult();
+
+        itemRequestDto = new ItemRequestDto();
+        itemRequestDto.setDescription("New request");
+        itemRequestService.addRequest(user.getId(), itemRequestDto);
+
+        itemRequestDto2 = new ItemRequestDto();
+        itemRequestDto.setDescription("New request");
+        itemRequestService.addRequest(user2.getId(), itemRequestDto2);
+    }
 
     @Test
     void addRequest() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        ItemRequestDto itemRequestDto = new ItemRequestDto();
-        itemRequestDto.setDescription("New request");
-        itemRequestService.addRequest(user.getId(), itemRequestDto);
         ItemRequest itemRequest = itemRequestRepository.findByUserId(user.getId(), Sort.unsorted()).getFirst();
 
         assertThat(itemRequest.getId(), notNullValue());
@@ -60,48 +80,13 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getUsersRequests() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        UserDto userDto2 = new UserDto("user2", "user2@user.com");
-        userService.createUser(userDto2);
-        TypedQuery<User> query2 = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user2 = query2.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        ItemRequestDto itemRequestDto = new ItemRequestDto();
-        itemRequestDto.setDescription("New request");
-        itemRequestService.addRequest(user.getId(), itemRequestDto);
-        ItemRequestDto itemRequestDto2 = new ItemRequestDto();
-        itemRequestDto.setDescription("New request");
-        itemRequestService.addRequest(user2.getId(), itemRequestDto2);
-
         List<ItemRequestDto> itemRequestDtoList = itemRequestService.getUsersRequests(user.getId());
 
         assertThat(itemRequestDtoList.size(), equalTo(2));
-
     }
 
     @Test
     void getAllRequests() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        UserDto userDto2 = new UserDto("user2", "user2@user.com");
-        userService.createUser(userDto2);
-        TypedQuery<User> query2 = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user2 = query2.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        ItemRequestDto itemRequestDto = new ItemRequestDto();
-        itemRequestDto.setDescription("New request");
-        itemRequestService.addRequest(user.getId(), itemRequestDto);
-        ItemRequestDto itemRequestDto2 = new ItemRequestDto();
-        itemRequestDto.setDescription("New request");
-        itemRequestService.addRequest(user2.getId(), itemRequestDto2);
-
         Set<ItemRequestRespDto> itemRequestRespDtos = itemRequestService.getAllRequests(user.getId());
 
         assertThat(itemRequestRespDtos.size(), equalTo(2));
@@ -110,25 +95,6 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getRequestById() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        UserDto userDto2 = new UserDto("user2", "user2@user.com");
-        userService.createUser(userDto2);
-        TypedQuery<User> query2 = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user2 = query2.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        ItemRequestDto itemRequestDto = new ItemRequestDto();
-        itemRequestDto.setDescription("New request");
-        itemRequestService.addRequest(user.getId(), itemRequestDto);
-
-
-        ItemRequestDto itemRequestDto2 = new ItemRequestDto();
-        itemRequestDto2.setDescription("New request2");
-        itemRequestService.addRequest(user2.getId(), itemRequestDto2);
-
         assertThat(itemRequestDto.getDescription(), equalTo(itemRequestService.getRequestById(user2.getId(),
                 itemRequestRepository.findByUserId(user2.getId(), Sort.unsorted()).getFirst().getId()).getDescription()));
     }

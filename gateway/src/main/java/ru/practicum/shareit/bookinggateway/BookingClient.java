@@ -10,7 +10,9 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.bookinggateway.dto.BookingDto;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.enumsgateway.BookingStatus;
+import ru.practicum.shareit.exceptiongateway.ValidationException;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service
@@ -27,7 +29,19 @@ public class BookingClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> addBooking(Integer userId, BookingDto bookingDto) {
+    public ResponseEntity<Object> addBooking(Integer userId, BookingDto bookingDto) throws Exception {
+        if ((bookingDto.getStart() == null) || bookingDto.getEnd() == null) {
+            throw new ValidationException("Не заданы параметры времени");
+        }
+        if (bookingDto.getEnd().isBefore(LocalDateTime.now())) {
+            throw new ValidationException("Некорректное время конца брогирования");
+        }
+        if (bookingDto.getStart().equals(bookingDto.getEnd())) {
+            throw new ValidationException("Старт и конец бронирования совпадают");
+        }
+        if (bookingDto.getStart().isBefore(LocalDateTime.now())) {
+            throw new ValidationException("Некорректное время начала бронирования");
+        }
         return post("", userId, bookingDto);
     }
 

@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
-@SpringBootTest //(properties = "jdbc.url=jdbc:postgresql://localhost:5432/test")
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemRequestControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();

@@ -20,9 +20,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(UserDto userDto) throws Exception {
-        if (!validation(userDto)) {
-            throw new ValidationException("Ошибка валидации");
-        }
+
         for (User userFromRep : userRepository.findAll()) {
             if (userFromRep.getEmail().equals(userDto.getEmail())) {
                 throw new AlreadyExistException("Данный пользователь уже добавлен");
@@ -43,15 +41,6 @@ public class UserServiceImpl implements UserService {
                     throw new AlreadyExistException("Почта уже используется");
                 }
             }
-
-
-            /*for (User userFromRep : userRepository.findAll()) {
-                if (userFromRep.getEmail().equals(userDto.getEmail())) {
-                    if (!userRepository.findById(userId).get().getEmail().equals(userDto.getEmail())) {
-                        throw new AlreadyExistException("Почта уже используется");
-                    }
-                }
-            }*/
         }
         User user = userRepository.findById(userId).get();
         if (userDto.getName() != null) {
@@ -76,12 +65,5 @@ public class UserServiceImpl implements UserService {
     @Override
     public void removeUser(Integer id) {
         userRepository.deleteById(id);
-    }
-
-    private boolean validation(UserDto userDto) {
-        return userDto.getEmail() != null
-                && !userDto.getEmail().isBlank()
-                && !userDto.getEmail().isEmpty()
-                && userDto.getEmail().contains("@");
     }
 }

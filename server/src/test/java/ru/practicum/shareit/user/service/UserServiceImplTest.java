@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.AlreadyExistException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
@@ -20,7 +19,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest //(properties = "jdbc.url=jdbc:postgresql://localhost:5432/test")
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserServiceImplTest {
     private final EntityManager entityManager;
@@ -36,11 +35,6 @@ class UserServiceImplTest {
         assertThat(user.getId(), notNullValue());
         assertThat(user.getName(), equalTo(userDto.getName()));
         assertThat(user.getEmail(), equalTo(userDto.getEmail()));
-
-        UserDto userWithEmptyEmail = new UserDto("user2", "");
-        ValidationException validationException = assertThrows(ValidationException.class,
-                () -> userService.createUser(userWithEmptyEmail));
-        assertThat("Ошибка валидации", equalTo(validationException.getMessage()));
 
         UserDto userWithSameEmail = new UserDto("user3", "user@user.com");
         AlreadyExistException alreadyExistException = assertThrows(AlreadyExistException.class,

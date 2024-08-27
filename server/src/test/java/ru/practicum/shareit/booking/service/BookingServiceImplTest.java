@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +31,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest //(properties = "jdbc:h2://localhost:5432/test") //jdbc.url=jdbc:postgresql://localhost:5432/test
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class BookingServiceImplTest {
     private final EntityManager entityManager;
@@ -40,26 +41,37 @@ class BookingServiceImplTest {
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
 
-    @Test
-    void addBooking() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
+    private UserDto userDto;
+    private User user;
+    private ItemDto itemDto;
+    private UserDto newUserDto;
+    private User newUser;
+    BookingDto bookingDto = new BookingDto();
+    Booking booking;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        userDto = new UserDto("user", "user@user.com");
         userService.createUser(userDto);
         TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
+        user = query.setParameter("email", userDto.getEmail()).getSingleResult();
 
-        ItemDto itemDto = new ItemDto("item", "description", true, null);
+        itemDto = new ItemDto("item", "description", true, null);
         itemService.addItem(user.getId(), itemDto);
 
-        UserDto newUserDto = new UserDto("New user", "newuser@user.com");
+        newUserDto = new UserDto("New user", "newuser@user.com");
         userService.createUser(newUserDto);
         TypedQuery<User> newQuery = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User newUser = newQuery.setParameter("email", newUserDto.getEmail()).getSingleResult();
+        newUser = newQuery.setParameter("email", newUserDto.getEmail()).getSingleResult();
 
-        BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(itemRepository.findByUserId(user.getId()).getFirst().getId());
         bookingDto.setStart(LocalDateTime.now().plusDays(1));
         bookingDto.setEnd(LocalDateTime.now().plusDays(2));
-        Booking booking = bookingService.addBooking(newUser.getId(), bookingDto);
+        booking = bookingService.addBooking(newUser.getId(), bookingDto);
+    }
+
+    @Test
+    void addBooking() throws Exception {
 
         assertThat(booking.getId(), notNullValue());
         assertThat(booking.getItem().getId(), equalTo(bookingDto.getItemId()));
@@ -72,10 +84,12 @@ class BookingServiceImplTest {
 
         ItemDto newItemDto = new ItemDto("New item", "New description", false, null);
         itemService.addItem(newUser.getId(), newItemDto);
+
         BookingDto newBookingDto = new BookingDto();
         newBookingDto.setItemId(itemRepository.findByUserId(newUser.getId()).getFirst().getId());
         newBookingDto.setStart(LocalDateTime.now().plusDays(1));
         newBookingDto.setEnd(LocalDateTime.now().plusDays(2));
+
         ValidationException validationException = assertThrows(ValidationException.class,
                 () -> bookingService.addBooking(newUser.getId(), newBookingDto));
 
@@ -90,25 +104,6 @@ class BookingServiceImplTest {
 
     @Test
     void patchBooking() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        ItemDto itemDto = new ItemDto("item", "description", true, null);
-        itemService.addItem(user.getId(), itemDto);
-
-        UserDto newUserDto = new UserDto("New user", "newuser@user.com");
-        userService.createUser(newUserDto);
-        TypedQuery<User> newQuery = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User newUser = newQuery.setParameter("email", newUserDto.getEmail()).getSingleResult();
-
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setItemId(itemRepository.findByUserId(user.getId()).getFirst().getId());
-        bookingDto.setStart(LocalDateTime.now().plusDays(1));
-        bookingDto.setEnd(LocalDateTime.now().plusDays(2));
-        Booking booking = bookingService.addBooking(newUser.getId(), bookingDto);
-
         Booking patchbooking = bookingService.patchBooking(user.getId(),
                 bookingRepository.findById(booking.getId()).get().getId(),
                 true);
@@ -136,25 +131,6 @@ class BookingServiceImplTest {
 
     @Test
     void getBooking() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        ItemDto itemDto = new ItemDto("item", "description", true, null);
-        itemService.addItem(user.getId(), itemDto);
-
-        UserDto newUserDto = new UserDto("New user", "newuser@user.com");
-        userService.createUser(newUserDto);
-        TypedQuery<User> newQuery = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User newUser = newQuery.setParameter("email", newUserDto.getEmail()).getSingleResult();
-
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setItemId(itemRepository.findByUserId(user.getId()).getFirst().getId());
-        bookingDto.setStart(LocalDateTime.now().plusDays(1));
-        bookingDto.setEnd(LocalDateTime.now().plusDays(2));
-        Booking booking = bookingService.addBooking(newUser.getId(), bookingDto);
-
         Booking getBooking = bookingService.getBooking(user.getId(), booking.getId());
 
         assertThat(booking, equalTo(getBooking));
@@ -162,25 +138,6 @@ class BookingServiceImplTest {
 
     @Test
     void getAllBookings() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        ItemDto itemDto = new ItemDto("item", "description", true, null);
-        itemService.addItem(user.getId(), itemDto);
-
-        UserDto newUserDto = new UserDto("New user", "newuser@user.com");
-        userService.createUser(newUserDto);
-        TypedQuery<User> newQuery = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User newUser = newQuery.setParameter("email", newUserDto.getEmail()).getSingleResult();
-
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setItemId(itemRepository.findByUserId(user.getId()).getFirst().getId());
-        bookingDto.setStart(LocalDateTime.now().plusDays(1));
-        bookingDto.setEnd(LocalDateTime.now().plusDays(2));
-        Booking booking = bookingService.addBooking(newUser.getId(), bookingDto);
-
         List<Booking> bookingList = bookingService.getAllBookings(newUser.getId(), BookingStatus.ALL);
 
         assertThat(bookingList.size(), equalTo(1));
@@ -188,25 +145,6 @@ class BookingServiceImplTest {
 
     @Test
     void getAllBookingsByOwner() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        ItemDto itemDto = new ItemDto("item", "description", true, null);
-        itemService.addItem(user.getId(), itemDto);
-
-        UserDto newUserDto = new UserDto("New user", "newuser@user.com");
-        userService.createUser(newUserDto);
-        TypedQuery<User> newQuery = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User newUser = newQuery.setParameter("email", newUserDto.getEmail()).getSingleResult();
-
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setItemId(itemRepository.findByUserId(user.getId()).getFirst().getId());
-        bookingDto.setStart(LocalDateTime.now().plusDays(1));
-        bookingDto.setEnd(LocalDateTime.now().plusDays(2));
-        Booking booking = bookingService.addBooking(newUser.getId(), bookingDto);
-
         List<Booking> bookingList = bookingService.getAllBookings(newUser.getId(), BookingStatus.ALL);
 
         assertThat(bookingList.size(), equalTo(1));

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
-@SpringBootTest //(properties = "jdbc.url=jdbc:postgresql://localhost:5432/test")
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -57,7 +56,6 @@ class ItemControllerTest {
     private final ItemRepository itemRepository;
     private final BookingService bookingService;
     private final BookingRepository bookingRepository;
-
 
     private final Item item = new Item();
     private final Item newItem = new Item();
@@ -80,7 +78,6 @@ class ItemControllerTest {
 
         newItem.setName(newItemDto.getName());
         newItem.setDescription(newItemDto.getDescription());
-
 
         UserDto userDto = new UserDto("user", "user@user.com");
         userService.createUser(userDto);
@@ -130,8 +127,6 @@ class ItemControllerTest {
                                 .andExpect(jsonPath("$.name", is(newItemDto.getName())))
                                 .andExpect(jsonPath("$.description", is(newItemDto.getDescription())))
                 );
-
-
     }
 
     @Test

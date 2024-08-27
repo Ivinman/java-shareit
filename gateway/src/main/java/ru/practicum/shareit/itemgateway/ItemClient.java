@@ -8,6 +8,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
+import ru.practicum.shareit.exceptiongateway.ValidationException;
 import ru.practicum.shareit.itemgateway.comment.CommentDto;
 import ru.practicum.shareit.itemgateway.dto.ItemDto;
 
@@ -27,7 +28,16 @@ public class ItemClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> addItem(Integer userId, ItemDto itemDto) {
+    public ResponseEntity<Object> addItem(Integer userId, ItemDto itemDto) throws Exception {
+        if (itemDto.getName() == null
+                || itemDto.getName().isBlank()
+                || itemDto.getName().isEmpty()
+                || itemDto.getDescription() == null
+                || itemDto.getDescription().isBlank()
+                || itemDto.getDescription().isEmpty()
+                || itemDto.getAvailable() == null) {
+            throw new ValidationException("Ошибка валидации");
+        }
         return post("", userId, itemDto);
     }
 

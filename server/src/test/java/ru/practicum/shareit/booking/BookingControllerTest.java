@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
-@SpringBootTest //(properties = "jdbc.url=jdbc:postgresql://localhost:5432/test")
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class BookingControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -53,10 +52,8 @@ class BookingControllerTest {
     private Integer newUserId;
     private Integer itemId;
     private final BookingRepository bookingRepository;
-
     private final Booking booking = new Booking();
     private final Booking newBooking = new Booking();
-
 
     @Mock
     private final BookingService bookingService;
@@ -94,12 +91,6 @@ class BookingControllerTest {
         newBookingDto.setItemId(newItemId);
         newBookingDto.setStart(LocalDateTime.now().plusDays(2));
         newBookingDto.setEnd(LocalDateTime.now().plusDays(3));
-
-        /*booking.setItem(itemRepository.findByUserId(userId).getFirst());
-        booking.setStart(bookingDto.getStart());
-        booking.setEnd(bookingDto.getEnd());*/
-
-
     }
 
     @Test

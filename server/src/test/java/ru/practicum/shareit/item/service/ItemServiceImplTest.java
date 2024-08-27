@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +37,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest //(properties = "jdbc.url=jdbc:postgresql://localhost:5432/test")
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemServiceImplTest {
     private final UserService userService;
@@ -47,17 +48,25 @@ class ItemServiceImplTest {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
 
-    @Test
-    void addItem() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
+    private UserDto userDto;
+    private User user;
+    private ItemDto itemDto;
+    private Item item;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        userDto = new UserDto("user", "user@user.com");
         userService.createUser(userDto);
         TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
+        user = query.setParameter("email", userDto.getEmail()).getSingleResult();
 
-        ItemDto itemDto = new ItemDto("item", "description", true, null);
+        itemDto = new ItemDto("item", "description", true, null);
         itemService.addItem(user.getId(), itemDto);
-        Item item = itemRepository.findByUserId(user.getId()).getFirst();
+        item = itemRepository.findByUserId(user.getId()).getFirst();
+    }
 
+    @Test
+    void addItem() throws Exception {
         assertThat(item.getId(), notNullValue());
         assertThat(item.getName(), equalTo(itemDto.getName()));
         assertThat(item.getDescription(), equalTo(itemDto.getDescription()));
@@ -72,14 +81,6 @@ class ItemServiceImplTest {
 
     @Test
     void editItem() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        ItemDto itemDto = new ItemDto("item", "description", true, null);
-        itemService.addItem(user.getId(), itemDto);
-
         ItemDto newItemDto = new ItemDto("New item", "New description", true, null);
         itemService.editItem(user.getId(), itemRepository.findByUserId(user.getId()).getFirst().getId(), newItemDto);
 
@@ -108,13 +109,6 @@ class ItemServiceImplTest {
 
     @Test
     void getItemById() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        ItemDto itemDto = new ItemDto("item", "description", true, null);
-        itemService.addItem(user.getId(), itemDto);
         ItemDto newItemDto = new ItemDto("New item", "New description", true, null);
         itemService.addItem(user.getId(), newItemDto);
 
@@ -122,18 +116,10 @@ class ItemServiceImplTest {
 
         assertThat(item.getName(), equalTo(itemDto.getName()));
         assertThat(item.getDescription(), equalTo(itemDto.getDescription()));
-
     }
 
     @Test
     void getItemsByOwnerId() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-        ItemDto itemDto = new ItemDto("item", "description", true, null);
-        itemService.addItem(user.getId(), itemDto);
-
         UserDto newUserDto = new UserDto("New user", "newuser@user.com");
         userService.createUser(newUserDto);
         TypedQuery<User> newQuery = entityManager.createQuery("select u from User u where u.email = :email", User.class);
@@ -148,13 +134,6 @@ class ItemServiceImplTest {
 
     @Test
     void getSearchedItems() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        ItemDto itemDto = new ItemDto("item", "description", true, null);
-        itemService.addItem(user.getId(), itemDto);
         ItemDto newItemDto = new ItemDto("New item", "New description", true, null);
         itemService.addItem(user.getId(), newItemDto);
 
@@ -166,14 +145,6 @@ class ItemServiceImplTest {
 
     @Test
     void addComment() throws Exception {
-        UserDto userDto = new UserDto("user", "user@user.com");
-        userService.createUser(userDto);
-        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
-        ItemDto itemDto = new ItemDto("item", "description", true, null);
-        itemService.addItem(user.getId(), itemDto);
-
         UserDto newUserDto = new UserDto("New user", "newuser@user.com");
         userService.createUser(newUserDto);
         TypedQuery<User> newQuery = entityManager.createQuery("select u from User u where u.email = :email", User.class);
