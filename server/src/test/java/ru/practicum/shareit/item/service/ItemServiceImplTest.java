@@ -48,14 +48,13 @@ class ItemServiceImplTest {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
 
-    private UserDto userDto;
     private User user;
     private ItemDto itemDto;
     private Item item;
 
     @BeforeEach
     void setUp() throws Exception {
-        userDto = new UserDto("user", "user@user.com");
+        UserDto userDto = new UserDto("user", "user@user.com");
         userService.createUser(userDto);
         TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
         user = query.setParameter("email", userDto.getEmail()).getSingleResult();

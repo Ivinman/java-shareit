@@ -42,19 +42,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemRequestControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final UserService userService;
+    private final UserRepository userRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Mock
     private final ItemRequestService itemRequestService;
 
     private MockMvc mockMvc;
+
     private ItemRequestDto itemRequestDto;
     private ItemRequestDto newItemRequestDto;
     private ItemRequest itemRequest;
-    private final UserService userService;
-    private final UserRepository userRepository;
     private Integer userId;
     private Integer newUserId;
-    private final ItemRequestRepository itemRequestRepository;
 
     @BeforeEach
     void setUp(WebApplicationContext wac) throws Exception {

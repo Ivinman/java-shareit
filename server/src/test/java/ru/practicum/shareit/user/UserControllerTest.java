@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.hamcrest.Matchers.is;
 
 @Transactional
-@SpringBootTest //(properties = "jdbc.url=jdbc:postgresql://localhost:5432/test")
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -69,10 +69,6 @@ class UserControllerTest {
 
     @Test
     void updateUser() throws Exception {
-        //userService.createUser(userDto);
-        //TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
-        //User user = query.setParameter("email", userDto.getEmail()).getSingleResult();
-
         UserDto updateUserDto = new UserDto("Newuser", "newuser@user.com");
         User updatedUser = new User();
         updatedUser.setName(updateUserDto.getName());
@@ -96,16 +92,6 @@ class UserControllerTest {
                                         .andExpect(jsonPath("$.name", is(updateUserDto.getName())))
                                         .andExpect(jsonPath("$.email", is(updateUserDto.getEmail())))
                         );
-        /*when(userService.updateUser(any(), any())).thenReturn(user);
-        mockMvc.perform(patch("/users/{userId}", 1)
-                        .content(objectMapper.writeValueAsString(userDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is(userDto.getName())))
-                .andExpect(jsonPath("$.email", is(userDto.getEmail())));*/
     }
 
     @Test
@@ -131,7 +117,6 @@ class UserControllerTest {
                                         result -> mockMvc.perform(get("/users"))
                                                 .andExpect(status().isOk())
                                                 .andExpect(jsonPath("$", hasSize(2)))
-
                                 )
                 );
     }

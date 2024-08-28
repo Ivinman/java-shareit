@@ -42,18 +42,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class BookingControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private BookingDto bookingDto;
-    private BookingDto newBookingDto;
     private final ItemRepository itemRepository;
     private final UserService userService;
     private final ItemService itemService;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+
+    private BookingDto bookingDto;
+    private BookingDto newBookingDto;
     private Integer userId;
     private Integer newUserId;
     private Integer itemId;
-    private final BookingRepository bookingRepository;
-    private final Booking booking = new Booking();
-    private final Booking newBooking = new Booking();
+
+    private Booking booking;
+    private Booking newBooking;
 
     @Mock
     private final BookingService bookingService;
@@ -81,6 +83,8 @@ class BookingControllerTest {
         itemService.addItem(newUserId, newItemDto);
         Integer newItemId = itemRepository.findByUserId(newUserId).getFirst().getId();
 
+        booking = new Booking();
+        newBooking = new Booking();
 
         bookingDto = new BookingDto();
         bookingDto.setItemId(itemId);

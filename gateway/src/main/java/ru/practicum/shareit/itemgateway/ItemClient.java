@@ -31,12 +31,16 @@ public class ItemClient extends BaseClient {
     public ResponseEntity<Object> addItem(Integer userId, ItemDto itemDto) throws Exception {
         if (itemDto.getName() == null
                 || itemDto.getName().isBlank()
-                || itemDto.getName().isEmpty()
-                || itemDto.getDescription() == null
+                || itemDto.getName().isEmpty()) {
+            throw new ValidationException("Название предмета не заполнено");
+        }
+        if (itemDto.getDescription() == null
                 || itemDto.getDescription().isBlank()
-                || itemDto.getDescription().isEmpty()
-                || itemDto.getAvailable() == null) {
-            throw new ValidationException("Ошибка валидации");
+                || itemDto.getDescription().isEmpty()) {
+            throw new ValidationException("Описание предмета не заполнено");
+        }
+        if (itemDto.getAvailable() == null) {
+            throw new ValidationException("Доступность предмета не указана");
         }
         return post("", userId, itemDto);
     }

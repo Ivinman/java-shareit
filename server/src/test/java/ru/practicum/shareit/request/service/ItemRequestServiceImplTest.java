@@ -34,21 +34,19 @@ class ItemRequestServiceImplTest {
     private final UserService userService;
     private final EntityManager entityManager;
     private final ItemRequestRepository itemRequestRepository;
-    private UserDto userDto;
-    private UserDto userDto2;
+
     private User user;
     private User user2;
     private ItemRequestDto itemRequestDto;
-    private ItemRequestDto itemRequestDto2;
 
     @BeforeEach
     void setUp() throws Exception {
-        userDto = new UserDto("user", "user@user.com");
+        UserDto userDto = new UserDto("user", "user@user.com");
         userService.createUser(userDto);
         TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
         user = query.setParameter("email", userDto.getEmail()).getSingleResult();
 
-        userDto2 = new UserDto("user2", "user2@user.com");
+        UserDto userDto2 = new UserDto("user2", "user2@user.com");
         userService.createUser(userDto2);
         TypedQuery<User> query2 = entityManager.createQuery("select u from User u where u.email = :email", User.class);
         user2 = query2.setParameter("email", userDto.getEmail()).getSingleResult();
@@ -57,7 +55,7 @@ class ItemRequestServiceImplTest {
         itemRequestDto.setDescription("New request");
         itemRequestService.addRequest(user.getId(), itemRequestDto);
 
-        itemRequestDto2 = new ItemRequestDto();
+        ItemRequestDto itemRequestDto2 = new ItemRequestDto();
         itemRequestDto.setDescription("New request");
         itemRequestService.addRequest(user2.getId(), itemRequestDto2);
     }

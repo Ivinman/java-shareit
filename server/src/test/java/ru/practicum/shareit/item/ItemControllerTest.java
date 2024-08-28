@@ -47,18 +47,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private ItemDto itemDto;
-    private ItemDto newItemDto;
     private final UserService userService;
-    private Integer userId;
-    private Integer newUserId;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingService bookingService;
     private final BookingRepository bookingRepository;
 
-    private final Item item = new Item();
-    private final Item newItem = new Item();
+    private ItemDto itemDto;
+    private ItemDto newItemDto;
+    private Integer userId;
+    private Integer newUserId;
+
+    private Item item;
+    private Item newItem;
 
     @Mock
     private final ItemService itemService;
@@ -73,9 +74,11 @@ class ItemControllerTest {
         itemDto = new ItemDto("item", "desc", true, null);
         newItemDto = new ItemDto("New item", "New desc", true, null);
 
+        item = new Item();
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
 
+        newItem = new Item();
         newItem.setName(newItemDto.getName());
         newItem.setDescription(newItemDto.getDescription());
 

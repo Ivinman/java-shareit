@@ -41,29 +41,27 @@ class BookingServiceImplTest {
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
 
-    private UserDto userDto;
     private User user;
-    private ItemDto itemDto;
-    private UserDto newUserDto;
     private User newUser;
-    BookingDto bookingDto = new BookingDto();
-    Booking booking;
+    private BookingDto bookingDto;
+    private Booking booking;
 
     @BeforeEach
     void setUp() throws Exception {
-        userDto = new UserDto("user", "user@user.com");
+        UserDto userDto = new UserDto("user", "user@user.com");
         userService.createUser(userDto);
         TypedQuery<User> query = entityManager.createQuery("select u from User u where u.email = :email", User.class);
         user = query.setParameter("email", userDto.getEmail()).getSingleResult();
 
-        itemDto = new ItemDto("item", "description", true, null);
+        ItemDto itemDto = new ItemDto("item", "description", true, null);
         itemService.addItem(user.getId(), itemDto);
 
-        newUserDto = new UserDto("New user", "newuser@user.com");
+        UserDto newUserDto = new UserDto("New user", "newuser@user.com");
         userService.createUser(newUserDto);
         TypedQuery<User> newQuery = entityManager.createQuery("select u from User u where u.email = :email", User.class);
         newUser = newQuery.setParameter("email", newUserDto.getEmail()).getSingleResult();
 
+        bookingDto = new BookingDto();
         bookingDto.setItemId(itemRepository.findByUserId(user.getId()).getFirst().getId());
         bookingDto.setStart(LocalDateTime.now().plusDays(1));
         bookingDto.setEnd(LocalDateTime.now().plusDays(2));

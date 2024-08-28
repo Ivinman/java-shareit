@@ -27,7 +27,7 @@ public class UserClient extends BaseClient {
 
     public ResponseEntity<Object> createUser(UserDto userDto) throws Exception {
         if (!validation(userDto)) {
-            throw new ValidationException("Ошибка валидации");
+            throw new ValidationException("Ошибка при введении почты");
         }
         return post("", userDto);
     }
